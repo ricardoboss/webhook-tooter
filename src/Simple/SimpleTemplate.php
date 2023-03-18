@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace ricardoboss\WebhookTooter\Simple;
 
-use ricardoboss\WebhookTooter\WebhookTooterTemplate;
+use ricardoboss\WebhookTooter\Template;
 
-class SimpleWebhookTooterTemplate implements WebhookTooterTemplate
+class SimpleTemplate implements Template
 {
 	public function __construct(private readonly string $templateFile)
 	{

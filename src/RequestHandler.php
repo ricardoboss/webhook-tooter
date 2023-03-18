@@ -6,18 +6,18 @@ namespace ricardoboss\WebhookTooter;
 use JsonException;
 use Psr\Http\Message\RequestInterface;
 
-class WebhookTooterHandler {
+class RequestHandler {
 	public const SignatureHeader = 'X-Hub-Signature-256';
 	public const SignatureAlgorithm = 'sha256';
 
 	public function __construct(
-		private readonly WebhookTooterConfig $config,
-		private readonly WebhookTooterRenderer $renderer,
-		private readonly WebhookTooterTemplateLocator $templateLocator,
-		private readonly WebhookTooterAPI $api,
+		private readonly WebhookConfig $config,
+		private readonly TemplateRenderer $renderer,
+		private readonly TemplateLocator $templateLocator,
+		private readonly ApiService $api,
 	) {}
 
-	public function handle(RequestInterface $request): WebhookTooterResult {
+	public function handle(RequestInterface $request): RequestHandlerResult {
 		$result = $this->verifyRequestHeaders($request);
 		if ($result !== null) {
 			return $result;
@@ -26,46 +26,46 @@ class WebhookTooterHandler {
 		$body = $request->getBody()->getContents();
 
 		if (!$this->verifySignature($request, $body)) {
-			return WebhookTooterResult::failure('Invalid request signature');
+			return RequestHandlerResult::failure('Invalid request signature');
 		}
 
 		try {
 			$payload = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
 		} catch (JsonException $e) {
-			return WebhookTooterResult::failure("Invalid request payload: " . $e->getMessage());
+			return RequestHandlerResult::failure("Invalid request payload: " . $e->getMessage());
 		}
 
 		$renderedTemplate = $this->renderTemplate($payload);
 		$note = $this->api->send($renderedTemplate);
 		$url = $this->api->getUrl($note);
 
-		return WebhookTooterResult::success($url, $note);
+		return RequestHandlerResult::success($url, $note);
 	}
 
-	private function verifyRequestHeaders(RequestInterface $request): ?WebhookTooterResult {
+	private function verifyRequestHeaders(RequestInterface $request): ?RequestHandlerResult {
 		$method = $request->getMethod();
 		if ($method !== 'POST') {
-			return WebhookTooterResult::failure("Invalid request method: $method");
+			return RequestHandlerResult::failure("Invalid request method: $method");
 		}
 
-		if ($this->config->webhookPath !== null) {
-			$webhookPath = (string) $this->config->webhookPath;
+		if ($this->config->path !== null) {
+			$webhookPath = (string) $this->config->path;
 			$actualPath = $request->getUri()->getPath();
 			if ($actualPath !== $webhookPath) {
-				return WebhookTooterResult::failure("Invalid request path: $actualPath");
+				return RequestHandlerResult::failure("Invalid request path: $actualPath");
 			}
 		}
 
 		$contentType = $request->getHeaderLine('Content-Type');
 		if ($contentType !== 'application/json') {
-			return WebhookTooterResult::failure("Invalid request content type: $contentType");
+			return RequestHandlerResult::failure("Invalid request content type: $contentType");
 		}
 
 		return null;
 	}
 
 	private function verifySignature(RequestInterface $request, string $body): bool {
-		if ($this->config->webhookSecret === null) {
+		if ($this->config->secret === null) {
 			return true;
 		}
 
@@ -76,7 +76,7 @@ class WebhookTooterHandler {
 
 		$signature = substr($signature, strlen(self::SignatureAlgorithm) + 1);
 
-		$hash = hash_hmac(self::SignatureAlgorithm, $body, (string) $this->config->webhookSecret);
+		$hash = hash_hmac(self::SignatureAlgorithm, $body, (string) $this->config->secret);
 
 		return hash_equals($hash, $signature);
 	}

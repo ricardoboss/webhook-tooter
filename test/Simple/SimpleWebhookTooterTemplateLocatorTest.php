@@ -5,12 +5,12 @@ namespace ricardoboss\WebhookTooter\Simple;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ricardoboss\WebhookTooter\WebhookTooterTemplate;
+use ricardoboss\WebhookTooter\Template;
 use RuntimeException;
 
 /**
- * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator
- * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplate
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleTemplate
  *
  * @internal
  */
@@ -20,8 +20,8 @@ class SimpleWebhookTooterTemplateLocatorTest extends TestCase {
 		yield ['data', "Data: {{ data }}\n"];
 	}
 
-	public function getLocator(): SimpleWebhookTooterTemplateLocator {
-		return new SimpleWebhookTooterTemplateLocator(dirname(__DIR__ ) . '/templates');
+	public function getLocator(): SimpleTemplateLocator {
+		return new SimpleTemplateLocator(dirname(__DIR__ ) . '/templates');
 	}
 
 	/**
@@ -31,7 +31,7 @@ class SimpleWebhookTooterTemplateLocatorTest extends TestCase {
 
 		$locator = $this->getLocator();
 		$template = $locator->getMatchingTemplate(['event' => $eventName]);
-		static::assertInstanceOf(WebhookTooterTemplate::class, $template);
+		static::assertInstanceOf(Template::class, $template);
 		static::assertEquals($expectedContents, $template->getContents());
 	}
 

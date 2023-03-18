@@ -4,11 +4,11 @@ declare(strict_types=1);
 namespace ricardoboss\WebhookTooter\Simple;
 
 use InvalidArgumentException;
-use ricardoboss\WebhookTooter\WebhookTooterTemplate;
-use ricardoboss\WebhookTooter\WebhookTooterTemplateLocator;
+use ricardoboss\WebhookTooter\Template;
+use ricardoboss\WebhookTooter\TemplateLocator;
 use RuntimeException;
 
-class SimpleWebhookTooterTemplateLocator implements WebhookTooterTemplateLocator
+class SimpleTemplateLocator implements TemplateLocator
 {
 	public function __construct(
 		private readonly string $templatesDirectory,
@@ -17,7 +17,7 @@ class SimpleWebhookTooterTemplateLocator implements WebhookTooterTemplateLocator
 	{
 	}
 
-	public function getMatchingTemplate(array $data): ?WebhookTooterTemplate
+	public function getMatchingTemplate(array $data): ?Template
 	{
 		if (!isset($data['event'])) {
 			throw new InvalidArgumentException("Missing 'event' key in payload");
@@ -31,10 +31,10 @@ class SimpleWebhookTooterTemplateLocator implements WebhookTooterTemplateLocator
 			return null;
 		}
 
-		return new SimpleWebhookTooterTemplate($templateFile);
+		return new SimpleTemplate($templateFile);
 	}
 
-	public function getDefaultTemplate(): WebhookTooterTemplate
+	public function getDefaultTemplate(): Template
 	{
 		throw new RuntimeException('No default template available');
 	}

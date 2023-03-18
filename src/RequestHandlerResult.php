@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace ricardoboss\WebhookTooter;
 
-class WebhookTooterResult
+class RequestHandlerResult
 {
 	public static function success(?string $url, ?object $note): self {
-		return new WebhookTooterResult(true, null, $url, $note);
+		return new RequestHandlerResult(true, null, $url, $note);
 	}
 
 	public static function failure(?string $message): self {
-		return new WebhookTooterResult(false, $message, null, null);
+		return new RequestHandlerResult(false, $message, null, null);
 	}
 
 	public function __construct(

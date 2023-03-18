@@ -5,10 +5,10 @@ namespace ricardoboss\WebhookTooter\API;
 
 use Coderjerk\BirdElephant\BirdElephant;
 use Coderjerk\BirdElephant\Compose\Tweet;
-use ricardoboss\WebhookTooter\WebhookTooterAPI;
+use ricardoboss\WebhookTooter\ApiService;
 use Throwable;
 
-class BirdElephantTwitterAPI implements WebhookTooterAPI
+class BirdElephantTwitterAPI implements ApiService
 {
 	private array $credentials = [];
 

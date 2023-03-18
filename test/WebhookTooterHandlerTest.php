@@ -9,18 +9,18 @@ use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Mockery as M;
-use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterRenderer;
-use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator;
+use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;
+use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;
 use stdClass;
 use Stringable;
 
 /**
- * @covers \ricardoboss\WebhookTooter\WebhookTooterHandler
- * @covers \ricardoboss\WebhookTooter\WebhookTooterConfig
- * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterRenderer
- * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator
- * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplate
- * @covers \ricardoboss\WebhookTooter\WebhookTooterResult
+ * @covers \ricardoboss\WebhookTooter\RequestHandler
+ * @covers \ricardoboss\WebhookTooter\WebhookConfig
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleTemplate
+ * @covers \ricardoboss\WebhookTooter\RequestHandlerResult
  *
  * @internal
  */
@@ -33,10 +33,10 @@ class WebhookTooterHandlerTest extends TestCase
 	{
 		$factory = new Psr17Factory();
 
-		$config = new WebhookTooterConfig('/webhook', 'secret');
-		$renderer = new SimpleWebhookTooterRenderer();
-		$templateLocator = new SimpleWebhookTooterTemplateLocator(__DIR__ . '/templates');
-		$twitter = M::mock(WebhookTooterAPI::class);
+		$config = new WebhookConfig('/webhook', 'secret');
+		$renderer = new SimpleTemplateRenderer();
+		$templateLocator = new SimpleTemplateLocator(__DIR__ . '/templates');
+		$twitter = M::mock(ApiService::class);
 
 		$testData = [
 			'event' => 'test',
@@ -53,11 +53,11 @@ class WebhookTooterHandlerTest extends TestCase
 		$testTweetUrl = "https://twitter.com/$testUsername/status/$testTweetId";
 
 		$baseRequest = $factory
-			->createRequest('POST', 'https://example.com' . $config->webhookPath)
+			->createRequest('POST', 'https://example.com' . $config->path)
 			->withHeader('Content-Type', 'application/json')
 			->withBody($factory->createStream($testDataJson))
-			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, $testDataJson, $config->webhookSecret));
-		$successResult = new WebhookTooterResult(true, null, $testTweetUrl, $testTweetObject);
+			->withHeader(RequestHandler::SignatureHeader, RequestHandler::SignatureAlgorithm . '=' . hash_hmac(RequestHandler::SignatureAlgorithm, $testDataJson, $config->secret));
+		$successResult = new RequestHandlerResult(true, null, $testTweetUrl, $testTweetObject);
 
 		$testDataWithTemplateData = [
 			'event' => 'data',
@@ -66,7 +66,7 @@ class WebhookTooterHandlerTest extends TestCase
 		$testDataWithTemplateDataJson = json_encode($testDataWithTemplateData, JSON_THROW_ON_ERROR);
 		$baseRequestWithData = $baseRequest
 			->withBody($factory->createStream($testDataWithTemplateDataJson))
-			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, $testDataWithTemplateDataJson, $config->webhookSecret))
+			->withHeader(RequestHandler::SignatureHeader, RequestHandler::SignatureAlgorithm . '=' . hash_hmac(RequestHandler::SignatureAlgorithm, $testDataWithTemplateDataJson, $config->secret))
 		;
 
 		$twitter
@@ -113,7 +113,7 @@ class WebhookTooterHandlerTest extends TestCase
 		];
 
 		$invalidMethodRequest = $baseRequest->withMethod('GET');
-		$invalidMethodResult = new WebhookTooterResult(false, 'Invalid request method: GET', null, null);
+		$invalidMethodResult = new RequestHandlerResult(false, 'Invalid request method: GET', null, null);
 
 		yield [
 			'config' => $config,
@@ -125,7 +125,7 @@ class WebhookTooterHandlerTest extends TestCase
 		];
 
 		$invalidPathRequest = $baseRequest->withUri(new Uri('https://example.com/not-the-webhook-path'));
-		$invalidPathResult = new WebhookTooterResult(false, 'Invalid request path: /not-the-webhook-path', null, null);
+		$invalidPathResult = new RequestHandlerResult(false, 'Invalid request path: /not-the-webhook-path', null, null);
 
 		yield [
 			'config' => $config,
@@ -136,8 +136,8 @@ class WebhookTooterHandlerTest extends TestCase
 			'expected' => $invalidPathResult,
 		];
 
-		$invalidSecretRequest = $baseRequest->withHeader(WebhookTooterHandler::SignatureHeader, 'not-the-signature');
-		$invalidSecretResult = new WebhookTooterResult(false, 'Invalid request signature', null, null);
+		$invalidSecretRequest = $baseRequest->withHeader(RequestHandler::SignatureHeader, 'not-the-signature');
+		$invalidSecretResult = new RequestHandlerResult(false, 'Invalid request signature', null, null);
 
 		yield [
 			'config' => $config,
@@ -149,7 +149,7 @@ class WebhookTooterHandlerTest extends TestCase
 		];
 
 		$invalidContentTypeRequest = $baseRequest->withHeader('Content-Type', 'application/x-www-form-urlencoded');
-		$invalidContentTypeResult = new WebhookTooterResult(false, 'Invalid request content type: application/x-www-form-urlencoded', null, null);
+		$invalidContentTypeResult = new RequestHandlerResult(false, 'Invalid request content type: application/x-www-form-urlencoded', null, null);
 
 		yield [
 			'config' => $config,
@@ -162,9 +162,9 @@ class WebhookTooterHandlerTest extends TestCase
 
 		$invalidContentRequest = $baseRequest
 			->withBody($factory->createStream('invalid-json'))
-			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, 'invalid-json', $config->webhookSecret))
+			->withHeader(RequestHandler::SignatureHeader, RequestHandler::SignatureAlgorithm . '=' . hash_hmac(RequestHandler::SignatureAlgorithm, 'invalid-json', $config->secret))
 		;
-		$invalidContentResult = new WebhookTooterResult(false, 'Invalid request payload: Syntax error', null, null);
+		$invalidContentResult = new RequestHandlerResult(false, 'Invalid request payload: Syntax error', null, null);
 
 		yield [
 			'config' => $config,
@@ -175,8 +175,8 @@ class WebhookTooterHandlerTest extends TestCase
 			'expected' => $invalidContentResult,
 		];
 
-		$configWithoutSecret = new WebhookTooterConfig('/webhook');
-		$baseRequestWithoutSignature = $baseRequest->withoutHeader(WebhookTooterHandler::SignatureHeader);
+		$configWithoutSecret = new WebhookConfig('/webhook');
+		$baseRequestWithoutSignature = $baseRequest->withoutHeader(RequestHandler::SignatureHeader);
 
 		yield [
 			'config' => $configWithoutSecret,
@@ -187,7 +187,7 @@ class WebhookTooterHandlerTest extends TestCase
 			'expected' => $successResult,
 		];
 
-		$configWithStringable = new WebhookTooterConfig(new class implements Stringable {
+		$configWithStringable = new WebhookConfig(new class implements Stringable {
 			public function __toString(): string
 			{
 				return '/webhook';
@@ -208,17 +208,17 @@ class WebhookTooterHandlerTest extends TestCase
 	 * @dataProvider requestProvider
 	 */
 	public function testHandle(
-		WebhookTooterConfig $config,
-		WebhookTooterRenderer $renderer,
-		WebhookTooterTemplateLocator $templateLocator,
-		WebhookTooterAPI $api,
+		WebhookConfig $config,
+		TemplateRenderer $renderer,
+		TemplateLocator $templateLocator,
+		ApiService $api,
 		RequestInterface $request,
-		WebhookTooterResult $expected,
+		RequestHandlerResult $expected,
 	): void
 	{
 		$request->getBody()->rewind();
 
-		$handler = new WebhookTooterHandler($config, $renderer, $templateLocator, $api);
+		$handler = new RequestHandler($config, $renderer, $templateLocator, $api);
 		$result = $handler->handle($request);
 
 		static::assertEquals($expected->success, $result->success);

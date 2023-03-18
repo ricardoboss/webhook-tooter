@@ -15,28 +15,28 @@ composer require ricardoboss/webhook-tooter
 
 ```php
 <?php
-use ricardoboss\WebhookTooter\WebhookTooterConfig;
-use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterRenderer;
-use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator;
-use ricardoboss\WebhookTooter\WebhookTooterHandler;
+use ricardoboss\WebhookTooter\WebhookConfig;
+use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;
+use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;
+use ricardoboss\WebhookTooter\RequestHandler;
 use ricardoboss\WebhookTooter\API\BirdElephantTwitterAPI;
 use ricardoboss\WebhookTooter\API\MastodonAPI;
-use ricardoboss\WebhookTooter\WebhookTooterAPI;
+use ricardoboss\WebhookTooter\ApiService;
 
 // 1. Create a config object
 // you can also pass \Stringable objects instead of strings
-$config = new WebhookTooterConfig(
+$config = new WebhookConfig(
     'webhook_url',   // nullable; null will ignore the path in the request
     'webhook_secret' // nullable; null will disable signature verification
 );
 
-// 2. Create an instance of WebhookTooterRenderer
+// 2. Create an instance of TemplateRenderer
 // either use your own renderer or use the simple renderer
-$renderer = new SimpleWebhookTooterRenderer();
+$renderer = new SimpleTemplateRenderer();
 
 // 3. Create a template locator instance
 // the simple locator looks for files in the given directory, and the given extension (name is passed to the getMatchingTemplate method)
-$locator = new SimpleWebhookTooterTemplateLocator(__DIR__ . '/templates', '.md');
+$locator = new SimpleTemplateLocator(__DIR__ . '/templates', '.md');
 
 // 4a. Create a Twitter API client
 $twitter = new BirdElephantTwitterAPI();
@@ -55,8 +55,8 @@ $mastodon->setClientId(xxxxx);     // Get your client ID, secret and token
 $mastodon->setClientSecret(xxxxx); // by creating an application in the developer
 $mastodon->setBearerToken(xxxxx);  // options on your mastodon instance.
 
-// 4c. You can supply any API you want as all it needs to implement is the WebhookTooterAPI interface
-$custom = new class implements WebhookTooterAPI {
+// 4c. You can supply any API you want as all it needs to implement is the ApiService interface
+$custom = new class implements ApiService {
     public function send(string $message): object {
         // TODO: send the given message to an API
     }
@@ -66,8 +66,8 @@ $custom = new class implements WebhookTooterAPI {
     }
 }
 
-// 5. Create a WebhookTooterHandler instance
-$handler = new WebhookTooterHandler($config, $renderer, $locator, $twitter);
+// 5. Create a RequestHandler instance
+$handler = new RequestHandler($config, $renderer, $locator, $twitter);
 
 // 6. Get a PSR-7 request object
 $request = /* get your request implementation */;

@@ -5,10 +5,10 @@ namespace ricardoboss\WebhookTooter\API;
 
 use Colorfield\Mastodon\MastodonAPI as ColorfieldMastodonAPI;
 use Colorfield\Mastodon\MastodonOAuth;
-use ricardoboss\WebhookTooter\WebhookTooterAPI;
+use ricardoboss\WebhookTooter\ApiService;
 use Throwable;
 
-class MastodonAPI implements WebhookTooterAPI {
+class MastodonAPI implements ApiService {
 	private string $appName = "ricardoboss/webhook-tooter";
 
 	private ?string $instanceUrl = null;
