@@ -1,6 +1,6 @@
 # Changelog
 
-## next
+## v0.5
 
 * Added Mastodon API client
 * All classes have been renamed to have a more precise name
