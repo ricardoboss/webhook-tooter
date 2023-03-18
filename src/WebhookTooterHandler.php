@@ -14,7 +14,7 @@ class WebhookTooterHandler {
 		private readonly WebhookTooterConfig $config,
 		private readonly WebhookTooterRenderer $renderer,
 		private readonly WebhookTooterTemplateLocator $templateLocator,
-		private readonly WebhookTooterAPI $twitter,
+		private readonly WebhookTooterAPI $api,
 	) {}
 
 	public function handle(RequestInterface $request): WebhookTooterResult {
@@ -36,10 +36,10 @@ class WebhookTooterHandler {
 		}
 
 		$renderedTemplate = $this->renderTemplate($payload);
-		$tweet = $this->twitter->send($renderedTemplate);
-		$url = $this->twitter->getUrl($tweet);
+		$note = $this->api->send($renderedTemplate);
+		$url = $this->api->getUrl($note);
 
-		return WebhookTooterResult::success($url, $tweet);
+		return WebhookTooterResult::success($url, $note);
 	}
 
 	private function verifyRequestHeaders(RequestInterface $request): ?WebhookTooterResult {

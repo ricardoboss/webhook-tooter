@@ -6,6 +6,7 @@ namespace ricardoboss\WebhookTooter\API;
 use Coderjerk\BirdElephant\BirdElephant;
 use Coderjerk\BirdElephant\Compose\Tweet;
 use ricardoboss\WebhookTooter\WebhookTooterAPI;
+use Throwable;
 
 class BirdElephantTwitterAPI implements WebhookTooterAPI
 {
@@ -24,10 +25,14 @@ class BirdElephantTwitterAPI implements WebhookTooterAPI
 	 */
 	public function send(string $message): object
 	{
-		$twitter = new BirdElephant($this->credentials);
-		$tweet = (new Tweet)->text($message);
+		try {
+			$twitter = new BirdElephant($this->credentials);
+			$tweet = (new Tweet())->text($message);
 
-		return $twitter->tweets()->tweet($tweet);
+			return $twitter->tweets()->tweet($tweet);
+		} catch (Throwable $t) {
+			throw new ApiException("Error thrown by API: " . $t->getMessage(), previous: $t);
+		}
 	}
 
 	public function getUrl(object $note): ?string {

@@ -25,7 +25,7 @@ class SimpleWebhookTooterTemplateLocator implements WebhookTooterTemplateLocator
 
 		$event = $data['event'];
 
-		$templateFile = $this->templatesDirectory . '/' . $event . $this->templateExtension;
+		$templateFile = rtrim($this->templatesDirectory, '/') . '/' . $event . $this->templateExtension;
 
 		if (!file_exists($templateFile)) {
 			return null;

@@ -4,8 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a3f5a5800bb4eff0c66d691ed4768b6d",
+    "content-hash": "5146e97ada81fde1ed72ce70b8b0d11b",
     "packages": [
+        {
+            "name": "afterlogic/mastodon-api",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/afterlogic/mastodon-api-php.git",
+                "reference": "8f87345c0a0288a0a00534ea5ce2f2a271a98e53"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/afterlogic/mastodon-api-php/zipball/8f87345c0a0288a0a00534ea5ce2f2a271a98e53",
+                "reference": "8f87345c0a0288a0a00534ea5ce2f2a271a98e53",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.4.5",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.5,>=4.5.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Colorfield\\Mastodon\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Christophe Jossart",
+                    "homepage": "https://colorfield.be"
+                }
+            ],
+            "description": "PHP wrapper for Mastodon API",
+            "homepage": "https://github.com/r-daneelolivaw/mastodon-api-php",
+            "keywords": [
+                "api",
+                "mastodon",
+                "php",
+                "rest"
+            ],
+            "support": {
+                "source": "https://github.com/afterlogic/mastodon-api-php/tree/0.1.1"
+            },
+            "time": "2022-12-08T12:23:29+00:00"
+        },
         {
             "name": "coderjerk/bird-elephant",
             "version": "v0.4.7",

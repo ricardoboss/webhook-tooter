@@ -224,6 +224,6 @@ class WebhookTooterHandlerTest extends TestCase
 		static::assertEquals($expected->success, $result->success);
 		static::assertEquals($expected->message, $result->message);
 		static::assertEquals($expected->url, $result->url);
-		static::assertEquals($expected->tweet, $result->tweet);
+		static::assertEquals($expected->note, $result->note);
 	}
 }
