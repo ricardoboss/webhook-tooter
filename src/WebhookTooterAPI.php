@@ -6,5 +6,5 @@ namespace ricardoboss\WebhookTooter;
 interface WebhookTooterAPI
 {
 	public function send(string $message): object;
-	public function getUrl(object $tweet): ?string;
+	public function getUrl(object $note): ?string;
 }

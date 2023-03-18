@@ -30,7 +30,7 @@ class BirdElephantTwitterAPI implements WebhookTooterAPI
 		return $twitter->tweets()->tweet($tweet);
 	}
 
-	public function getUrl(object $tweet): ?string {
-		return sprintf('https://twitter.com/%s/status/%s', $tweet->user->screen_name, $tweet->data->id);
+	public function getUrl(object $note): ?string {
+		return sprintf('https://twitter.com/%s/status/%s', $note->user->screen_name, $note->data->id);
 	}
 }
