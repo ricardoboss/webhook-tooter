@@ -62,7 +62,7 @@ $custom = new class implements ApiService {
     }
 
     public function getUrl(object $note): ?string {
-        // TODO: build a URL to the send message using the returned object
+        // TODO: build a URL to the sent message using the returned object
     }
 }
 
