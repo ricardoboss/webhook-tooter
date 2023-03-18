@@ -2,8 +2,8 @@
 
 ## next
 
-* Refactored `WebhookTweeter` to `WebhookTooter`
 * Added Mastodon API client
+* All classes have been renamed to have a more precise name
 
 ## v0.4
 
