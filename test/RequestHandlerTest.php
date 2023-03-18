@@ -24,7 +24,7 @@ use Stringable;
  *
  * @internal
  */
-class WebhookTooterHandlerTest extends TestCase
+class RequestHandlerTest extends TestCase
 {
 	/**
 	 * @throws JsonException

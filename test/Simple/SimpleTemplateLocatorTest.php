@@ -14,7 +14,7 @@ use RuntimeException;
  *
  * @internal
  */
-class SimpleWebhookTooterTemplateLocatorTest extends TestCase {
+class SimpleTemplateLocatorTest extends TestCase {
 	public function eventNamesProvider(): iterable {
 		yield ['test', "This is a test template.\n"];
 		yield ['data', "Data: {{ data }}\n"];
