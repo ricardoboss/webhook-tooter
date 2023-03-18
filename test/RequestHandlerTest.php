@@ -9,7 +9,7 @@ use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Mockery as M;
-use ricardoboss\WebhookTooter\API\Twitter\TwitterApiResult;
+use ricardoboss\WebhookTooter\API\Twitter\TwitterApiResponse;
 use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;
 use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;
 use stdClass;
@@ -51,7 +51,7 @@ class RequestHandlerTest extends TestCase
 		$testTweetObject->user->screen_name = $testUsername;
 		$testTweetObject->data = new stdClass();
 		$testTweetObject->data->id = $testTweetId;
-		$testTweetResult = new TwitterApiResult($testTweetObject);
+		$testTweetResult = new TwitterApiResponse($testTweetObject);
 
 		$baseRequest = $factory
 			->createRequest('POST', 'https://example.com' . $config->path)

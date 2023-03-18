@@ -5,8 +5,8 @@ namespace ricardoboss\WebhookTooter;
 
 class RequestHandlerResult
 {
-	public static function success(ApiResult $result): self {
-		return new RequestHandlerResult(true, null, $result);
+	public static function success(ApiResponse $response): self {
+		return new RequestHandlerResult(true, null, $response);
 	}
 
 	public static function failure(?string $message): self {
@@ -16,7 +16,7 @@ class RequestHandlerResult
 	public function __construct(
 		public readonly bool $success,
 		public readonly ?string $message,
-		public readonly ?ApiResult $result,
+		public readonly ?ApiResponse $result,
 	)
 	{
 	}

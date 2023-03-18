@@ -20,7 +20,7 @@ class BirdElephantTwitterAPI implements ApiService
 		$this->credentials = $credentials;
 	}
 
-	public function send(string $message): TwitterApiResult
+	public function send(string $message): TwitterApiResponse
 	{
 		$twitter = new BirdElephant($this->credentials);
 		$tweet = (new Tweet())->text($message);
@@ -31,6 +31,6 @@ class BirdElephantTwitterAPI implements ApiService
 			throw new TwitterApiException("Error thrown by API: " . $t->getMessage(), previous: $t);
 		}
 
-		return new TwitterApiResult($tweetResult);
+		return new TwitterApiResponse($tweetResult);
 	}
 }

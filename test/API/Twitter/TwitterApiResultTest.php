@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * @covers \ricardoboss\WebhookTooter\API\Twitter\TwitterApiResult
+ * @covers \ricardoboss\WebhookTooter\API\Twitter\TwitterApiResponse
  *
  * @internal
  */
@@ -28,7 +28,7 @@ class TwitterApiResultTest extends TestCase {
 	 * @dataProvider tweetObjectProvider
 	 */
 	public function testGetTweetUrl(object $tweet, ?string $expectedUrl): void {
-		$result = new TwitterApiResult($tweet);
+		$result = new TwitterApiResponse($tweet);
 		$url = $result->getUrl();
 
 		static::assertEquals($expectedUrl, $url);

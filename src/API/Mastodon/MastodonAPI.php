@@ -69,7 +69,7 @@ class MastodonAPI implements ApiService {
 		return new ColorfieldMastodonAPI($config);
 	}
 
-	public function send(string $message): MastodonApiResult {
+	public function send(string $message): MastodonApiResponse {
 		$api = $this->getApi();
 
 		try {
@@ -88,6 +88,6 @@ class MastodonAPI implements ApiService {
 			throw new MastodonApiException("The API returned an error: " . $statusResponse['error']);
 		}
 
-		return new MastodonApiResult($statusResponse);
+		return new MastodonApiResponse($statusResponse);
 	}
 }

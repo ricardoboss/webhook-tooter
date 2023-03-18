@@ -75,8 +75,7 @@ The result has the following properties:
 
 - `$result->success`: `true` if the message was sent successfully, `false` otherwise
 - `$result->message`: an error message if the message was not sent successfully
-- `$result->url`: a URL to the note
-- `$result->note`: the object returned from the API
+- `$result->response`: the object returned from the API
 
 ## Credits
 

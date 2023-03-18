@@ -6,7 +6,7 @@ namespace ricardoboss\WebhookTooter\API\Mastodon;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \ricardoboss\WebhookTooter\API\Mastodon\MastodonApiResult
+ * @covers \ricardoboss\WebhookTooter\API\Mastodon\MastodonApiResponse
  *
  * @internal
  */
@@ -23,7 +23,7 @@ class MastodonApiResultTest extends TestCase {
 	 * @dataProvider mastodonStatusProvider
 	 */
 	public function testGetUrl(array $status, ?string $expectedUrl): void {
-		$result = new MastodonApiResult($status);
+		$result = new MastodonApiResponse($status);
 		$url = $result->getUrl();
 
 		static::assertEquals($expectedUrl, $url);

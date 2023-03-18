@@ -3,6 +3,6 @@ declare(strict_types=1);
 
 namespace ricardoboss\WebhookTooter;
 
-interface ApiResult {
-	public function getUrl(): ?string;
+interface ApiResponse {
+	public function getUrl(): string;
 }
