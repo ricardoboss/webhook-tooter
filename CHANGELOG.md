@@ -3,6 +3,7 @@
 ## next
 
 * Refactored `WebhookTweeter` to `WebhookTooter`
+* Added Mastodon API client
 
 ## v0.4
 
