@@ -4,6 +4,7 @@
 
 * Added Mastodon API client
 * All classes have been renamed to have a more precise name
+* New API interface `ApiResponse` to wrap responses returned by the API clients
 
 ## v0.4
 
