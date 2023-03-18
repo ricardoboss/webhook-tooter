@@ -9,6 +9,7 @@ use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Mockery as M;
+use ricardoboss\WebhookTooter\API\Twitter\TwitterApiResult;
 use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;
 use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;
 use stdClass;
@@ -50,14 +51,14 @@ class RequestHandlerTest extends TestCase
 		$testTweetObject->user->screen_name = $testUsername;
 		$testTweetObject->data = new stdClass();
 		$testTweetObject->data->id = $testTweetId;
-		$testTweetUrl = "https://twitter.com/$testUsername/status/$testTweetId";
+		$testTweetResult = new TwitterApiResult($testTweetObject);
 
 		$baseRequest = $factory
 			->createRequest('POST', 'https://example.com' . $config->path)
 			->withHeader('Content-Type', 'application/json')
 			->withBody($factory->createStream($testDataJson))
 			->withHeader(RequestHandler::SignatureHeader, RequestHandler::SignatureAlgorithm . '=' . hash_hmac(RequestHandler::SignatureAlgorithm, $testDataJson, $config->secret));
-		$successResult = new RequestHandlerResult(true, null, $testTweetUrl, $testTweetObject);
+		$successResult = new RequestHandlerResult(true, null, $testTweetResult);
 
 		$testDataWithTemplateData = [
 			'event' => 'data',
@@ -72,24 +73,19 @@ class RequestHandlerTest extends TestCase
 		$twitter
 			->expects('send')
 			->with("This is a test template.\n")
-			->andReturns($testTweetObject)
+			->andReturns($testTweetResult)
 		;
 		$twitter
 			->expects('send')
 			->with("Data: " . $testDataWithTemplateData['data'] . "\n")
-			->andReturns($testTweetObject)
-		;
-		$twitter
-			->expects('getUrl')
-			->with($testTweetObject)
-			->andReturns($testTweetUrl)
+			->andReturns($testTweetResult)
 		;
 
 		yield [
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $baseRequest,
 			'expected' => $successResult,
 		];
@@ -98,7 +94,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $baseRequestWithData,
 			'expected' => $successResult,
 		];
@@ -107,7 +103,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $baseRequest,
 			'expected' => $successResult,
 		];
@@ -119,7 +115,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $invalidMethodRequest,
 			'expected' => $invalidMethodResult,
 		];
@@ -131,7 +127,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $invalidPathRequest,
 			'expected' => $invalidPathResult,
 		];
@@ -143,7 +139,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $invalidSecretRequest,
 			'expected' => $invalidSecretResult,
 		];
@@ -155,7 +151,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $invalidContentTypeRequest,
 			'expected' => $invalidContentTypeResult,
 		];
@@ -170,7 +166,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $config,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $invalidContentRequest,
 			'expected' => $invalidContentResult,
 		];
@@ -182,7 +178,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $configWithoutSecret,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $baseRequestWithoutSignature,
 			'expected' => $successResult,
 		];
@@ -198,7 +194,7 @@ class RequestHandlerTest extends TestCase
 			'config' => $configWithStringable,
 			'renderer' => $renderer,
 			'templateLocator' => $templateLocator,
-			'twitter' => $twitter,
+			'api' => $twitter,
 			'request' => $baseRequestWithoutSignature,
 			'expected' => $successResult,
 		];
@@ -223,7 +219,6 @@ class RequestHandlerTest extends TestCase
 
 		static::assertEquals($expected->success, $result->success);
 		static::assertEquals($expected->message, $result->message);
-		static::assertEquals($expected->url, $result->url);
-		static::assertEquals($expected->note, $result->note);
+		static::assertEquals($expected->result, $result->result);
 	}
 }

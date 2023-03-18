@@ -36,10 +36,9 @@ class RequestHandler {
 		}
 
 		$renderedTemplate = $this->renderTemplate($payload);
-		$note = $this->api->send($renderedTemplate);
-		$url = $this->api->getUrl($note);
+		$apiResult = $this->api->send($renderedTemplate);
 
-		return RequestHandlerResult::success($url, $note);
+		return RequestHandlerResult::success($apiResult);
 	}
 
 	private function verifyRequestHeaders(RequestInterface $request): ?RequestHandlerResult {

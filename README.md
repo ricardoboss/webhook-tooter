@@ -15,13 +15,7 @@ composer require ricardoboss/webhook-tooter
 
 ```php
 <?php
-use ricardoboss\WebhookTooter\WebhookConfig;
-use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;
-use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;
-use ricardoboss\WebhookTooter\RequestHandler;
-use ricardoboss\WebhookTooter\API\BirdElephantTwitterAPI;
-use ricardoboss\WebhookTooter\API\MastodonAPI;
-use ricardoboss\WebhookTooter\ApiService;
+use ricardoboss\WebhookTooter\API\Mastodon\MastodonAPI;use ricardoboss\WebhookTooter\API\Twitter\BirdElephantTwitterAPI;use ricardoboss\WebhookTooter\ApiService;use ricardoboss\WebhookTooter\RequestHandler;use ricardoboss\WebhookTooter\Simple\SimpleTemplateLocator;use ricardoboss\WebhookTooter\Simple\SimpleTemplateRenderer;use ricardoboss\WebhookTooter\WebhookConfig;
 
 // 1. Create a config object
 // you can also pass \Stringable objects instead of strings

@@ -5,6 +5,5 @@ namespace ricardoboss\WebhookTooter;
 
 interface ApiService
 {
-	public function send(string $message): object;
-	public function getUrl(object $note): ?string;
+	public function send(string $message): ApiResult;
 }

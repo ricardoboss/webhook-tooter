@@ -1,13 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTooter\API;
+namespace ricardoboss\WebhookTooter\API\Mastodon;
 
 use Colorfield\Mastodon\MastodonAPI as ColorfieldMastodonAPI;
 use Colorfield\Mastodon\MastodonOAuth;
 use ricardoboss\WebhookTooter\ApiService;
 use Throwable;
 
+/**
+ * @codeCoverageIgnore
+ */
 class MastodonAPI implements ApiService {
 	private string $appName = "ricardoboss/webhook-tooter";
 
@@ -19,59 +22,41 @@ class MastodonAPI implements ApiService {
 
 	private ?string $clientSecret = null;
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function setAppName(string $name): void {
 		$this->appName = $name;
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function setInstanceUrl(string $url): void {
 		$this->instanceUrl = $url;
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function setBearerToken(string $token): void {
 		$this->bearerToken = $token;
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function setClientId(string $clientId): void {
 		$this->clientId = $clientId;
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	public function setClientSecret(string $clientSecret): void {
 		$this->clientSecret = $clientSecret;
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
 	private function getApi(): ColorfieldMastodonAPI {
 		if ($this->instanceUrl === null) {
-			throw new ApiException("No instance URL has been configured");
+			throw new MastodonConfigurationException("No instance URL has been configured");
 		}
 
 		if ($this->clientId === null) {
-			throw new ApiException("No clientId has been configured");
+			throw new MastodonConfigurationException("No clientId has been configured");
 		}
 
 		if ($this->clientSecret === null) {
-			throw new ApiException("No clientId has been configured");
+			throw new MastodonConfigurationException("No clientId has been configured");
 		}
 
 		if ($this->bearerToken === null) {
-			throw new ApiException("No bearerToken has been configured");
+			throw new MastodonConfigurationException("No bearerToken has been configured");
 		}
 
 		$oauth = new MastodonOAuth($this->appName, $this->instanceUrl);
@@ -84,14 +69,11 @@ class MastodonAPI implements ApiService {
 		return new ColorfieldMastodonAPI($config);
 	}
 
-	/**
-	 * @codeCoverageIgnore
-	 */
-	public function send(string $message): object {
+	public function send(string $message): MastodonApiResult {
 		$api = $this->getApi();
 
 		try {
-			$result = $api->getResponse(
+			$statusResponse = $api->getResponse(
 				'/statuses',
 				'POST',
 				[
@@ -99,17 +81,13 @@ class MastodonAPI implements ApiService {
 				]
 			);
 		} catch (Throwable $t) {
-			throw new ApiException("An exception occurred while performing the API request", previous: $t);
+			throw new MastodonApiException("An exception occurred while performing the API request", previous: $t);
 		}
 
-		if (isset($result['error'])) {
-			throw new ApiException("The API returned an error: " . $result['error']);
+		if (isset($statusResponse['error'])) {
+			throw new MastodonApiException("The API returned an error: " . $statusResponse['error']);
 		}
 
-		return (object)$result;
-	}
-
-	public function getUrl(object $note): ?string {
-		return $note->url;
+		return new MastodonApiResult($statusResponse);
 	}
 }

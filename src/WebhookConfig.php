@@ -5,6 +5,9 @@ namespace ricardoboss\WebhookTooter;
 
 use Stringable;
 
+/**
+ * @codeCoverageIgnore
+ */
 class WebhookConfig {
 	public function __construct(
 		public readonly string|Stringable|null $path = null,
