@@ -75,15 +75,20 @@ The result has the following properties:
 
 - `$result->success`: `true` if the message was sent successfully, `false` otherwise
 - `$result->message`: an error message if the message was not sent successfully
-- `$result->response`: the object returned from the API
+- `$result->response`: the object returned from the API client (has a `getUrl` method, which returns a link to the
+  created post)
 
 ## Credits
 
 These nice people provide neat PHP interfaces for the Twitter and Mastodon APIs!
 
-Thanks to [danieldevine](https://github.com/danieldevine) for creating [BirdElephant](https://github.com/danieldevine/bird-elephant)!
+Thanks to [danieldevine](https://github.com/danieldevine) for
+creating [BirdElephant](https://github.com/danieldevine/bird-elephant)!
 
-Thanks to [colorfield](https://github.com/colorfield) for creating [mastodon-api-php](https://github.com/colorfield/mastodon-api-php) and [afterlogic](https://github.com/afterlogic) for maintaining a [fork](https://github.com/afterlogic/mastodon-api-php) of it!
+Thanks to [colorfield](https://github.com/colorfield) for
+creating [mastodon-api-php](https://github.com/colorfield/mastodon-api-php)
+and [afterlogic](https://github.com/afterlogic) for maintaining a [fork](https://github.com/afterlogic/mastodon-api-php)
+of it!
 
 ## License
 
