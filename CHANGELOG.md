@@ -1,5 +1,9 @@
 # Changelog
 
+## next
+
+* Refactored `WebhookTweeter` to `WebhookTooter`
+
 ## v0.4
 
 * Added GitHub actions pipeline
