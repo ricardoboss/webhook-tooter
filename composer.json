@@ -1,5 +1,5 @@
 {
-    "name": "ricardoboss/webhook-tweeter",
+    "name": "ricardoboss/webhook-tooter",
     "description": "Validating and parsing of GitHub webhook requests and posting to Twitter",
     "license": "MIT",
     "type": "library",
@@ -23,12 +23,12 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "ricardoboss\\WebhookTweeter\\": "src/"
+            "ricardoboss\\WebhookTooter\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ricardoboss\\WebhookTweeter\\": "test/"
+            "ricardoboss\\WebhookTooter\\": "test/"
         }
     },
     "scripts": {

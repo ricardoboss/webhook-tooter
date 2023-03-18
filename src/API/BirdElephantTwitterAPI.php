@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter\API;
+namespace ricardoboss\WebhookTooter\API;
 
 use Coderjerk\BirdElephant\BirdElephant;
 use Coderjerk\BirdElephant\Compose\Tweet;
-use ricardoboss\WebhookTweeter\WebhookTweeterTwitterAPI;
+use ricardoboss\WebhookTooter\WebhookTooterAPI;
 
-class BirdElephantTwitterAPI implements WebhookTweeterTwitterAPI
+class BirdElephantTwitterAPI implements WebhookTooterAPI
 {
 	private array $credentials = [];
 
@@ -22,7 +22,7 @@ class BirdElephantTwitterAPI implements WebhookTweeterTwitterAPI
 	/**
 	 * @codeCoverageIgnore
 	 */
-	public function sendTweet(string $message): object
+	public function send(string $message): object
 	{
 		$twitter = new BirdElephant($this->credentials);
 		$tweet = (new Tweet)->text($message);
@@ -30,7 +30,7 @@ class BirdElephantTwitterAPI implements WebhookTweeterTwitterAPI
 		return $twitter->tweets()->tweet($tweet);
 	}
 
-	public function getTweetUrl(object $tweet): ?string {
+	public function getUrl(object $tweet): ?string {
 		return sprintf('https://twitter.com/%s/status/%s', $tweet->user->screen_name, $tweet->data->id);
 	}
 }

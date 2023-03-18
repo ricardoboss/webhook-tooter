@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07c3fc5908c855a8ba5f0593c33e7577",
+    "content-hash": "a3f5a5800bb4eff0c66d691ed4768b6d",
     "packages": [
         {
             "name": "coderjerk/bird-elephant",

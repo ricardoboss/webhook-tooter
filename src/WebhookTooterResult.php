@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter;
+namespace ricardoboss\WebhookTooter;
 
-class WebhookTweeterResult
+class WebhookTooterResult
 {
 	public static function success(?string $url, ?object $tweet): self {
-		return new WebhookTweeterResult(true, null, $url, $tweet);
+		return new WebhookTooterResult(true, null, $url, $tweet);
 	}
 
 	public static function failure(?string $message): self {
-		return new WebhookTweeterResult(false, $message, null, null);
+		return new WebhookTooterResult(false, $message, null, null);
 	}
 
 	public function __construct(

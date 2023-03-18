@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter;
+namespace ricardoboss\WebhookTooter;
 
-interface WebhookTweeterTemplate
+interface WebhookTooterTemplate
 {
 	public function getContents(): string;
 }

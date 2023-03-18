@@ -1,27 +1,27 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter\Simple;
+namespace ricardoboss\WebhookTooter\Simple;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ricardoboss\WebhookTweeter\WebhookTweeterTemplate;
+use ricardoboss\WebhookTooter\WebhookTooterTemplate;
 use RuntimeException;
 
 /**
- * @covers \ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterTemplateLocator
- * @covers \ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterTemplate
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplate
  *
  * @internal
  */
-class SimpleWebhookTweeterTemplateLocatorTest extends TestCase {
+class SimpleWebhookTooterTemplateLocatorTest extends TestCase {
 	public function eventNamesProvider(): iterable {
 		yield ['test', "This is a test template.\n"];
 		yield ['data', "Data: {{ data }}\n"];
 	}
 
-	public function getLocator(): SimpleWebhookTweeterTemplateLocator {
-		return new SimpleWebhookTweeterTemplateLocator(dirname(__DIR__ ) . '/templates');
+	public function getLocator(): SimpleWebhookTooterTemplateLocator {
+		return new SimpleWebhookTooterTemplateLocator(dirname(__DIR__ ) . '/templates');
 	}
 
 	/**
@@ -31,7 +31,7 @@ class SimpleWebhookTweeterTemplateLocatorTest extends TestCase {
 
 		$locator = $this->getLocator();
 		$template = $locator->getMatchingTemplate(['event' => $eventName]);
-		static::assertInstanceOf(WebhookTweeterTemplate::class, $template);
+		static::assertInstanceOf(WebhookTooterTemplate::class, $template);
 		static::assertEquals($expectedContents, $template->getContents());
 	}
 

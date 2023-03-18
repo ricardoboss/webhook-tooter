@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter;
+namespace ricardoboss\WebhookTooter;
 
 use JsonException;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -9,22 +9,22 @@ use Nyholm\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Mockery as M;
-use ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterRenderer;
-use ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterTemplateLocator;
+use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterRenderer;
+use ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator;
 use stdClass;
 use Stringable;
 
 /**
- * @covers \ricardoboss\WebhookTweeter\WebhookTweeterHandler
- * @covers \ricardoboss\WebhookTweeter\WebhookTweeterConfig
- * @covers \ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterRenderer
- * @covers \ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterTemplateLocator
- * @covers \ricardoboss\WebhookTweeter\Simple\SimpleWebhookTweeterTemplate
- * @covers \ricardoboss\WebhookTweeter\WebhookTweeterResult
+ * @covers \ricardoboss\WebhookTooter\WebhookTooterHandler
+ * @covers \ricardoboss\WebhookTooter\WebhookTooterConfig
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterRenderer
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplateLocator
+ * @covers \ricardoboss\WebhookTooter\Simple\SimpleWebhookTooterTemplate
+ * @covers \ricardoboss\WebhookTooter\WebhookTooterResult
  *
  * @internal
  */
-class WebhookTweeterHandlerTest extends TestCase
+class WebhookTooterHandlerTest extends TestCase
 {
 	/**
 	 * @throws JsonException
@@ -33,10 +33,10 @@ class WebhookTweeterHandlerTest extends TestCase
 	{
 		$factory = new Psr17Factory();
 
-		$config = new WebhookTweeterConfig('/webhook', 'secret');
-		$renderer = new SimpleWebhookTweeterRenderer();
-		$templateLocator = new SimpleWebhookTweeterTemplateLocator(__DIR__ . '/templates');
-		$twitter = M::mock(WebhookTweeterTwitterAPI::class);
+		$config = new WebhookTooterConfig('/webhook', 'secret');
+		$renderer = new SimpleWebhookTooterRenderer();
+		$templateLocator = new SimpleWebhookTooterTemplateLocator(__DIR__ . '/templates');
+		$twitter = M::mock(WebhookTooterAPI::class);
 
 		$testData = [
 			'event' => 'test',
@@ -56,8 +56,8 @@ class WebhookTweeterHandlerTest extends TestCase
 			->createRequest('POST', 'https://example.com' . $config->webhookPath)
 			->withHeader('Content-Type', 'application/json')
 			->withBody($factory->createStream($testDataJson))
-			->withHeader(WebhookTweeterHandler::SignatureHeader, WebhookTweeterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTweeterHandler::SignatureAlgorithm, $testDataJson, $config->webhookSecret));
-		$successResult = new WebhookTweeterResult(true, null, $testTweetUrl, $testTweetObject);
+			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, $testDataJson, $config->webhookSecret));
+		$successResult = new WebhookTooterResult(true, null, $testTweetUrl, $testTweetObject);
 
 		$testDataWithTemplateData = [
 			'event' => 'data',
@@ -66,21 +66,21 @@ class WebhookTweeterHandlerTest extends TestCase
 		$testDataWithTemplateDataJson = json_encode($testDataWithTemplateData, JSON_THROW_ON_ERROR);
 		$baseRequestWithData = $baseRequest
 			->withBody($factory->createStream($testDataWithTemplateDataJson))
-			->withHeader(WebhookTweeterHandler::SignatureHeader, WebhookTweeterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTweeterHandler::SignatureAlgorithm, $testDataWithTemplateDataJson, $config->webhookSecret))
+			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, $testDataWithTemplateDataJson, $config->webhookSecret))
 		;
 
 		$twitter
-			->expects('sendTweet')
+			->expects('send')
 			->with("This is a test template.\n")
 			->andReturns($testTweetObject)
 		;
 		$twitter
-			->expects('sendTweet')
+			->expects('send')
 			->with("Data: " . $testDataWithTemplateData['data'] . "\n")
 			->andReturns($testTweetObject)
 		;
 		$twitter
-			->expects('getTweetUrl')
+			->expects('getUrl')
 			->with($testTweetObject)
 			->andReturns($testTweetUrl)
 		;
@@ -113,7 +113,7 @@ class WebhookTweeterHandlerTest extends TestCase
 		];
 
 		$invalidMethodRequest = $baseRequest->withMethod('GET');
-		$invalidMethodResult = new WebhookTweeterResult(false, 'Invalid request method: GET', null, null);
+		$invalidMethodResult = new WebhookTooterResult(false, 'Invalid request method: GET', null, null);
 
 		yield [
 			'config' => $config,
@@ -125,7 +125,7 @@ class WebhookTweeterHandlerTest extends TestCase
 		];
 
 		$invalidPathRequest = $baseRequest->withUri(new Uri('https://example.com/not-the-webhook-path'));
-		$invalidPathResult = new WebhookTweeterResult(false, 'Invalid request path: /not-the-webhook-path', null, null);
+		$invalidPathResult = new WebhookTooterResult(false, 'Invalid request path: /not-the-webhook-path', null, null);
 
 		yield [
 			'config' => $config,
@@ -136,8 +136,8 @@ class WebhookTweeterHandlerTest extends TestCase
 			'expected' => $invalidPathResult,
 		];
 
-		$invalidSecretRequest = $baseRequest->withHeader(WebhookTweeterHandler::SignatureHeader, 'not-the-signature');
-		$invalidSecretResult = new WebhookTweeterResult(false, 'Invalid request signature', null, null);
+		$invalidSecretRequest = $baseRequest->withHeader(WebhookTooterHandler::SignatureHeader, 'not-the-signature');
+		$invalidSecretResult = new WebhookTooterResult(false, 'Invalid request signature', null, null);
 
 		yield [
 			'config' => $config,
@@ -149,7 +149,7 @@ class WebhookTweeterHandlerTest extends TestCase
 		];
 
 		$invalidContentTypeRequest = $baseRequest->withHeader('Content-Type', 'application/x-www-form-urlencoded');
-		$invalidContentTypeResult = new WebhookTweeterResult(false, 'Invalid request content type: application/x-www-form-urlencoded', null, null);
+		$invalidContentTypeResult = new WebhookTooterResult(false, 'Invalid request content type: application/x-www-form-urlencoded', null, null);
 
 		yield [
 			'config' => $config,
@@ -162,9 +162,9 @@ class WebhookTweeterHandlerTest extends TestCase
 
 		$invalidContentRequest = $baseRequest
 			->withBody($factory->createStream('invalid-json'))
-			->withHeader(WebhookTweeterHandler::SignatureHeader, WebhookTweeterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTweeterHandler::SignatureAlgorithm, 'invalid-json', $config->webhookSecret))
+			->withHeader(WebhookTooterHandler::SignatureHeader, WebhookTooterHandler::SignatureAlgorithm . '=' . hash_hmac(WebhookTooterHandler::SignatureAlgorithm, 'invalid-json', $config->webhookSecret))
 		;
-		$invalidContentResult = new WebhookTweeterResult(false, 'Invalid request payload: Syntax error', null, null);
+		$invalidContentResult = new WebhookTooterResult(false, 'Invalid request payload: Syntax error', null, null);
 
 		yield [
 			'config' => $config,
@@ -175,8 +175,8 @@ class WebhookTweeterHandlerTest extends TestCase
 			'expected' => $invalidContentResult,
 		];
 
-		$configWithoutSecret = new WebhookTweeterConfig('/webhook');
-		$baseRequestWithoutSignature = $baseRequest->withoutHeader(WebhookTweeterHandler::SignatureHeader);
+		$configWithoutSecret = new WebhookTooterConfig('/webhook');
+		$baseRequestWithoutSignature = $baseRequest->withoutHeader(WebhookTooterHandler::SignatureHeader);
 
 		yield [
 			'config' => $configWithoutSecret,
@@ -187,7 +187,7 @@ class WebhookTweeterHandlerTest extends TestCase
 			'expected' => $successResult,
 		];
 
-		$configWithStringable = new WebhookTweeterConfig(new class implements Stringable {
+		$configWithStringable = new WebhookTooterConfig(new class implements Stringable {
 			public function __toString(): string
 			{
 				return '/webhook';
@@ -208,17 +208,17 @@ class WebhookTweeterHandlerTest extends TestCase
 	 * @dataProvider requestProvider
 	 */
 	public function testHandle(
-		WebhookTweeterConfig $config,
-		WebhookTweeterRenderer $renderer,
-		WebhookTweeterTemplateLocator $templateLocator,
-		WebhookTweeterTwitterAPI $twitter,
+		WebhookTooterConfig $config,
+		WebhookTooterRenderer $renderer,
+		WebhookTooterTemplateLocator $templateLocator,
+		WebhookTooterAPI $api,
 		RequestInterface $request,
-		WebhookTweeterResult $expected,
+		WebhookTooterResult $expected,
 	): void
 	{
 		$request->getBody()->rewind();
 
-		$handler = new WebhookTweeterHandler($config, $renderer, $templateLocator, $twitter);
+		$handler = new WebhookTooterHandler($config, $renderer, $templateLocator, $api);
 		$result = $handler->handle($request);
 
 		static::assertEquals($expected->success, $result->success);

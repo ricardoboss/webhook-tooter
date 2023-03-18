@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter\Simple;
+namespace ricardoboss\WebhookTooter\Simple;
 
-use ricardoboss\WebhookTweeter\WebhookTweeterTemplate;
+use ricardoboss\WebhookTooter\WebhookTooterTemplate;
 
-class SimpleWebhookTweeterTemplate implements WebhookTweeterTemplate
+class SimpleWebhookTooterTemplate implements WebhookTooterTemplate
 {
 	public function __construct(private readonly string $templateFile)
 	{

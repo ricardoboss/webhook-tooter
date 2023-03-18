@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter\Simple;
+namespace ricardoboss\WebhookTooter\Simple;
 
 use InvalidArgumentException;
-use ricardoboss\WebhookTweeter\WebhookTweeterTemplate;
-use ricardoboss\WebhookTweeter\WebhookTweeterTemplateLocator;
+use ricardoboss\WebhookTooter\WebhookTooterTemplate;
+use ricardoboss\WebhookTooter\WebhookTooterTemplateLocator;
 use RuntimeException;
 
-class SimpleWebhookTweeterTemplateLocator implements WebhookTweeterTemplateLocator
+class SimpleWebhookTooterTemplateLocator implements WebhookTooterTemplateLocator
 {
 	public function __construct(
 		private readonly string $templatesDirectory,
@@ -17,7 +17,7 @@ class SimpleWebhookTweeterTemplateLocator implements WebhookTweeterTemplateLocat
 	{
 	}
 
-	public function getMatchingTemplate(array $data): ?WebhookTweeterTemplate
+	public function getMatchingTemplate(array $data): ?WebhookTooterTemplate
 	{
 		if (!isset($data['event'])) {
 			throw new InvalidArgumentException("Missing 'event' key in payload");
@@ -31,10 +31,10 @@ class SimpleWebhookTweeterTemplateLocator implements WebhookTweeterTemplateLocat
 			return null;
 		}
 
-		return new SimpleWebhookTweeterTemplate($templateFile);
+		return new SimpleWebhookTooterTemplate($templateFile);
 	}
 
-	public function getDefaultTemplate(): WebhookTweeterTemplate
+	public function getDefaultTemplate(): WebhookTooterTemplate
 	{
 		throw new RuntimeException('No default template available');
 	}

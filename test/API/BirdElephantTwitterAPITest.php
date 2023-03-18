@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter\API;
+namespace ricardoboss\WebhookTooter\API;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * @covers \ricardoboss\WebhookTweeter\API\BirdElephantTwitterAPI
+ * @covers \ricardoboss\WebhookTooter\API\BirdElephantTwitterAPI
  *
  * @internal
  */
@@ -27,7 +27,7 @@ class BirdElephantTwitterAPITest extends TestCase {
 	 */
 	public function testGetTweetUrl(object $tweet, ?string $expectedUrl): void {
 		$api = new BirdElephantTwitterAPI();
-		$url = $api->getTweetUrl($tweet);
+		$url = $api->getUrl($tweet);
 
 		static::assertEquals($expectedUrl, $url);
 	}

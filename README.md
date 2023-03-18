@@ -7,7 +7,7 @@ This can, for example, be used to tweet a release notification when a new releas
 ## Installation
 
 ```bash
-composer require ricardoboss/webhook-tweeter
+composer require ricardoboss/webhook-tooter
 ```
 
 ## Usage

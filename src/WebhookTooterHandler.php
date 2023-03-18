@@ -1,23 +1,23 @@
 <?php
 declare(strict_types=1);
 
-namespace ricardoboss\WebhookTweeter;
+namespace ricardoboss\WebhookTooter;
 
 use JsonException;
 use Psr\Http\Message\RequestInterface;
 
-class WebhookTweeterHandler {
+class WebhookTooterHandler {
 	public const SignatureHeader = 'X-Hub-Signature-256';
 	public const SignatureAlgorithm = 'sha256';
 
 	public function __construct(
-		private readonly WebhookTweeterConfig $config,
-		private readonly WebhookTweeterRenderer $renderer,
-		private readonly WebhookTweeterTemplateLocator $templateLocator,
-		private readonly WebhookTweeterTwitterAPI $twitter,
+		private readonly WebhookTooterConfig $config,
+		private readonly WebhookTooterRenderer $renderer,
+		private readonly WebhookTooterTemplateLocator $templateLocator,
+		private readonly WebhookTooterAPI $twitter,
 	) {}
 
-	public function handle(RequestInterface $request): WebhookTweeterResult {
+	public function handle(RequestInterface $request): WebhookTooterResult {
 		$result = $this->verifyRequestHeaders($request);
 		if ($result !== null) {
 			return $result;
@@ -26,39 +26,39 @@ class WebhookTweeterHandler {
 		$body = $request->getBody()->getContents();
 
 		if (!$this->verifySignature($request, $body)) {
-			return WebhookTweeterResult::failure('Invalid request signature');
+			return WebhookTooterResult::failure('Invalid request signature');
 		}
 
 		try {
 			$payload = json_decode($body, true, flags: JSON_THROW_ON_ERROR);
 		} catch (JsonException $e) {
-			return WebhookTweeterResult::failure("Invalid request payload: " . $e->getMessage());
+			return WebhookTooterResult::failure("Invalid request payload: " . $e->getMessage());
 		}
 
 		$renderedTemplate = $this->renderTemplate($payload);
-		$tweet = $this->twitter->sendTweet($renderedTemplate);
-		$url = $this->twitter->getTweetUrl($tweet);
+		$tweet = $this->twitter->send($renderedTemplate);
+		$url = $this->twitter->getUrl($tweet);
 
-		return WebhookTweeterResult::success($url, $tweet);
+		return WebhookTooterResult::success($url, $tweet);
 	}
 
-	private function verifyRequestHeaders(RequestInterface $request): ?WebhookTweeterResult {
+	private function verifyRequestHeaders(RequestInterface $request): ?WebhookTooterResult {
 		$method = $request->getMethod();
 		if ($method !== 'POST') {
-			return WebhookTweeterResult::failure("Invalid request method: $method");
+			return WebhookTooterResult::failure("Invalid request method: $method");
 		}
 
 		if ($this->config->webhookPath !== null) {
 			$webhookPath = (string) $this->config->webhookPath;
 			$actualPath = $request->getUri()->getPath();
 			if ($actualPath !== $webhookPath) {
-				return WebhookTweeterResult::failure("Invalid request path: $actualPath");
+				return WebhookTooterResult::failure("Invalid request path: $actualPath");
 			}
 		}
 
 		$contentType = $request->getHeaderLine('Content-Type');
 		if ($contentType !== 'application/json') {
-			return WebhookTweeterResult::failure("Invalid request content type: $contentType");
+			return WebhookTooterResult::failure("Invalid request content type: $contentType");
 		}
 
 		return null;
